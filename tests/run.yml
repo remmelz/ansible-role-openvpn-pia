@@ -1,0 +1,8 @@
+
+
+- name: Configuring PIA openvpn
+  hosts: desktop
+
+  roles:
+    - ansible-role-openvpn-pia
+

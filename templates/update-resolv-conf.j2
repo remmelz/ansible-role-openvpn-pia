@@ -1,0 +1,15 @@
+#!/bin/bash
+
+resolv_conf="/etc/resolv.conf"
+
+if [[ -z `grep {{ pia_dns1 }} ${resolv_conf}` ]]; then
+  sed 's/^nameserver/#nameserver/g' -i ${resolv_conf}
+  echo 'nameserver {{ pia_dns1 }}' >> ${resolv_conf}
+  echo 'nameserver {{ pia_dns2 }}' >> ${resolv_conf}
+else
+  sed 's/^#nameserver/nameserver/g' -i ${resolv_conf}
+  sed '/{{ pia_dns1 }}/d' -i ${resolv_conf}
+  sed '/{{ pia_dns2 }}/d' -i ${resolv_conf}
+fi
+
+exit 0

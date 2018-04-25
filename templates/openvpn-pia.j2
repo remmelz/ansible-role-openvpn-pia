@@ -1,0 +1,11 @@
+#!/bin/bash
+
+cd /etc/openvpn/pia || exit 1
+
+if [[ -f ${1} ]]; then
+  openvpn ${1}
+else
+  openvpn "{{ pia_default }}"
+fi
+
+exit 0

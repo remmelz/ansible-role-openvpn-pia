@@ -1,0 +1,8 @@
+
+---
+
+  pia_dns1: 209.222.18.222
+  pia_dns2: 209.222.18.218
+  pia_cfg: "https://www.privateinternetaccess.com/openvpn/openvpn-tcp.zip"
+  pia_default: "US New York City.ovpn"
+

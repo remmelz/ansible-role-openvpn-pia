@@ -1,0 +1,90 @@
+
+---
+
+  - name: Installing required packages
+    package:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - openvpn
+      - sudo
+
+  - name: Creating PIA directories
+    file:
+      path: "{{ item }}"
+      state: directory
+      mode: 0755
+    with_items:
+      - /etc/openvpn/pia
+      - /etc/openvpn/scripts
+
+  - name: Downloading PIA openvpn configs
+    unarchive:
+      src: "{{ pia_cfg }}"
+      dest: /etc/openvpn/pia
+      remote_src: yes
+
+  - name: Get ovpn files on remote host
+    find:
+      paths: /etc/openvpn/pia
+      patterns: "*.ovpn"
+    register: ovpn
+  
+  - name: Changing auth-user-pass settings
+    lineinfile:
+      path: "{{ item.path }}"
+      regexp: '^auth-user-pass'
+      line: 'auth-user-pass /etc/openvpn/secret'
+    with_items: "{{ ovpn.files }}"
+
+  - name: Updating ovpn configurations
+    blockinfile:
+      path: "{{ item.path }}"
+      state: present
+      block: |
+        script-security 2
+        up /etc/openvpn/scripts/update-resolv-conf
+        down /etc/openvpn/scripts/update-resolv-conf
+    with_items: "{{ ovpn.files }}"
+    
+  - name: Copying PIA up-down script
+    template:
+      src: ./templates/update-resolv-conf.j2
+      dest: /etc/openvpn/scripts/update-resolv-conf
+      owner: root
+      group: root
+      mode: 0755
+
+  - name: Copying PIA start script
+    template:
+      src: ./templates/openvpn-pia.j2
+      dest: /etc/openvpn/scripts/openvpn-pia
+      owner: root
+      group: root
+      mode: 0755
+
+  - name: Copying PIA sudoers file
+    template:
+      src: ./templates/sudoers.j2
+      dest: /etc/sudoers.d/pia
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: Copying PIA desktop file
+    template:
+      src: ./templates/pia-manager.desktop.j2
+      dest: /usr/share/applications/pia-manager.desktop
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: Creating secret file
+    copy:
+      dest: /etc/openvpn/secret
+      mode: 0640
+      owner: root
+      group: root
+      content: |
+        user
+        pass
