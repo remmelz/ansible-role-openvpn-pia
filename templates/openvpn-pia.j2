@@ -1,16 +1,25 @@
 #!/bin/bash
 
-#
-# Start the openvpn client. To set the default openvpn configuration, 
-# you need to "touch" ovpn the file in /etc/openvpn/pia
-#
+homedir=`grep ${SUDO_USER} /etc/passwd | awk -F':' '{print $6}'`
+homepia="${homedir}/.pia"
+default="{{ pia_default }}"
 
 cd /etc/openvpn/pia || exit 1
 
-if [[ -f ${1} ]]; then
-  openvpn ${1}
+function startVPN {
+  basename "${1}"
+  openvpn "${1}"
+}
+
+if [[ -d ${homepia} ]]; then
+  if [[ -n `ls ${homepia}/*.ovpn` ]]; then
+    startVPN "`find ${homepia} -name '*.ovpn' | head -1`"
+  else
+    startVPN "${default}"
+  fi
 else
-  openvpn "`ls -1t *.ovpn | head -1`"
+  startVPN "${default}"
 fi
 
 exit 0
+
