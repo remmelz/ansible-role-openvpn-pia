@@ -7,3 +7,13 @@ Edit the /etc/openvpn/secret file and set your credentials.
 $ vi /etc/openvpn/secret
 ```
 
+## change default server
+Create a directory .pia in your home dir. In the .pia directory create
+a symlink to one of the openvpn configuration settings.
+```
+$ cd ~
+$ mkdir .pia
+$ cd .pia
+$ ln -s /etc/openvpn/pia/Sweden.ovpn
+```
+The configuation in the local homedir will now be read by the script.
