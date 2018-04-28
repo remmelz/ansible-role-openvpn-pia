@@ -9,7 +9,7 @@ $ vi /etc/openvpn/secret
 
 ## change default server
 Create a directory .pia in your home dir. In the .pia directory create
-a symlink to one of the openvpn configuration settings.
+a symlink to one of the openvpn configuration settings. For example:
 ```
 $ cd ~
 $ mkdir .pia
