@@ -1,11 +1,16 @@
 #!/bin/bash
 
+#
+# Start the openvpn client. To set the default openvpn configuration, 
+# you need to "touch" ovpn the file in /etc/openvpn/pia
+#
+
 cd /etc/openvpn/pia || exit 1
 
 if [[ -f ${1} ]]; then
   openvpn ${1}
 else
-  openvpn "{{ pia_default }}"
+  openvpn "`ls -1t *.ovpn | head -1`"
 fi
 
 exit 0
