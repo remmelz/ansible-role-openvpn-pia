@@ -82,7 +82,7 @@
   - name: Creating secret file
     copy:
       dest: /etc/openvpn/secret
-      mode: 0640
+      mode: 0600
       owner: root
       group: root
       content: |
