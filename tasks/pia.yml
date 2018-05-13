@@ -79,7 +79,7 @@
       group: root
       mode: 0644
 
-  - name: Creating secret file
+  - name: Creating secret file /etc/openvpn/secret
     copy:
       dest: /etc/openvpn/secret
       mode: 0600
