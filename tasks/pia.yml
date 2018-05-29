@@ -79,6 +79,11 @@
       group: root
       mode: 0644
 
+  - name: Check that the somefile.conf exists
+    stat:
+      path: /etc/openvpn/secret
+    register: secretfile
+
   - name: Creating secret file /etc/openvpn/secret
     copy:
       dest: /etc/openvpn/secret
@@ -88,3 +93,5 @@
       content: |
         user
         pass
+    when: secretfile.stat.exists == False
+
