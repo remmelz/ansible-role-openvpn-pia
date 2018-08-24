@@ -62,7 +62,7 @@ if [[ -n `echo ${select} | grep -i "y"` ]]; then
   rm -f *.ovpn
 
   ln -vs ${ovpndir}/${ovpncfg}
-  chown ${SUDO_USER} ${homevpn}
+  chown ${SUDO_USER}. ${homevpn}
 
 fi
 
