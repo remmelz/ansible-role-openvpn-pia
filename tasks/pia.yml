@@ -91,7 +91,7 @@
       owner: root
       group: root
       content: |
-        user
-        pass
+        <user>
+        <pass>
     when: secretfile.stat.exists == False
 
