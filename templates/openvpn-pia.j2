@@ -1,19 +1,79 @@
 #!/bin/bash
 
+[[ -z ${SUDO_USER} ]] && SUDO_USER="root"
+
+###################################
+# Default variables
+###################################
+
+ovpndir="/etc/openvpn/pia"
+secret="/etc/openvpn/secret"
 homedir=`grep ${SUDO_USER} /etc/passwd | awk -F':' '{print $6}'`
-homepia="${homedir}/.pia"
+homevpn="${homedir}/.pia"
 default="{{ pia_default }}"
 
-cd /etc/openvpn/pia || exit 1
+###################################
+# Functions
+###################################
 
 function startVPN {
   basename "${1}"
   openvpn "${1}"
 }
 
-if [[ -d ${homepia} ]]; then
-  if [[ -n `ls ${homepia}/*.ovpn` ]]; then
-    startVPN "`find ${homepia} -name '*.ovpn' | head -1`"
+function createSecret {
+
+    echo "<user>" >  ${secret}
+    echo "<pass>" >> ${secret}
+
+    vi ${secret}
+    chmod -v 600 ${secret}
+}
+
+###################################
+# Check credentials
+###################################
+
+if [[ -f ${secret} ]]; then
+  if [[ -n `head -1 ${secret} | grep '<user>'` ]]; then
+    createSecret
+  fi
+else
+  createSecret
+fi
+
+###################################
+# Select VPN config
+###################################
+
+read -t 4 -p "Select server? (y/n): " select
+
+if [[ -n `echo ${select} | grep -i "y"` ]]; then
+
+  ls ${ovpndir}
+  echo
+  read -p "Select: " ovpncfg
+
+  [[ -z ${ovpncfg} ]]              && exit 1
+  [[ ! -f ${ovpndir}/${ovpncfg} ]] && exit 1
+  [[ ! -d ${homevpn} ]] && mkdir -p ${homevpn}
+
+  cd ${homevpn} || exit 1
+  rm -f *.ovpn
+
+  ln -vs ${ovpndir}/${ovpncfg}
+
+fi
+
+###################################
+# Start VPN connection
+###################################
+
+cd /etc/openvpn/pia || exit 1
+
+if [[ -d ${homevpn} ]]; then
+  if [[ -n `ls ${homevpn}/*.ovpn` ]]; then
+    startVPN "`find ${homevpn} -name '*.ovpn' | head -1`"
   else
     startVPN "${default}"
   fi
