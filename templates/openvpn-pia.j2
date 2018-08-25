@@ -10,7 +10,7 @@ ovpndir="/etc/openvpn/pia"
 secret="/etc/openvpn/secret"
 homedir=`grep ${SUDO_USER} /etc/passwd | awk -F':' '{print $6}'`
 homevpn="${homedir}/.pia"
-default="{{ pia_default }}"
+default="Netherlands.ovpn"
 
 ###################################
 # Functions
@@ -43,10 +43,22 @@ else
 fi
 
 ###################################
+# Checking for ovpn files
+###################################
+
+ovpncfg=${default}
+if [[ -d ${homevpn} ]]; then
+  if [[ -n `ls ${homevpn}/*.ovpn` ]]; then
+    ovpncfg=`find ${homevpn} -name '*.ovpn' | head -1`
+  fi
+fi 
+
+###################################
 # Select VPN config
 ###################################
 
-read -t 4 -p "Select server? (y/n): " select
+echo "Connecting to ${ovpncfg} in 3 seconds..."
+read -t 4 -p "Select other server? (y): " select
 
 if [[ -n `echo ${select} | grep -i "y"` ]]; then
 
@@ -61,7 +73,7 @@ if [[ -n `echo ${select} | grep -i "y"` ]]; then
   cd ${homevpn} || exit 1
   rm -f *.ovpn
 
-  ln -vs ${ovpndir}/${ovpncfg}
+  ln -vs "${ovpndir}/${ovpncfg}"
   chown ${SUDO_USER}. ${homevpn}
 
 fi
@@ -71,16 +83,6 @@ fi
 ###################################
 
 cd /etc/openvpn/pia || exit 1
-
-if [[ -d ${homevpn} ]]; then
-  if [[ -n `ls ${homevpn}/*.ovpn` ]]; then
-    startVPN "`find ${homevpn} -name '*.ovpn' | head -1`"
-  else
-    startVPN "${default}"
-  fi
-else
-  startVPN "${default}"
-fi
+startVPN ${ovpncfg}
 
 exit 0
-
