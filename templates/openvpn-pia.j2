@@ -57,7 +57,7 @@ fi
 # Select VPN config
 ###################################
 
-echo "Connecting to ${ovpncfg} in 3 seconds..."
+echo "Connecting to `basename ${ovpncfg}` in 3 seconds..."
 read -t 4 -p "Select other server? (y): " select
 
 if [[ -n `echo ${select} | grep -i "y"` ]]; then
